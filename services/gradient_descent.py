@@ -1,38 +1,41 @@
+import numpy as np
+import copy
+
 class GradientDescent:
     # > calculate the gradient of the cost function mse
     # > formula: dJ(w,b)/dw, dJ(w,b)/db
     @staticmethod
-    def gradient(w, b, x, y):
-        d_w = 0
-        d_b = 0
-        m = x.shape[0]
+    def gradient(w, b, X, y):
+        m,n = X.shape
+        dj_w = np.zeros((n,))
+        dj_b = 0
 
         for i in range(m):
-            prediction = w * x[i] + b
-            d_w += (prediction - y[i]) * x[i]
-            d_b += (prediction - y[i])
+            err = (np.dot(X[i], w) + b) - y[i]
+            for j in range(n):
+                dj_w[j] += err * X[i,j]
+            dj_b += err
 
-        d_w = d_w / m
-        d_b = d_b / m
-        return d_w, d_b
+        dj_w = dj_w / m
+        dj_b = dj_b / m
+        return dj_w, dj_b
     
     # > gradient descent
     # > formula: w - a * d_w, b - a * d_b
     @staticmethod
-    def call(w_init, b_init, alpha, iters, x, y, mse, predictor):
-        w = w_init
+    def call(w_init, b_init, alpha, iters, X, y, mse):
+        w = copy.deepcopy(w_init)
         b = b_init
         history = []
 
         #run until iterations are done
         for i in range(iters):
-            d_w,d_b = GradientDescent.gradient(w, b, x, y)
-            w = w - alpha * d_w
-            b = b - alpha * d_b
+            dj_w,dj_b = GradientDescent.gradient(w, b, X, y)
+            w = w - alpha * dj_w
+            b = b - alpha * dj_b
 
             #store the cost per iteration
-            predictions = predictor.predict(w, b, x)
-            cost = mse.call(predictions, x, y)
+            cost = mse.call(w, b, X, y)
             history.append(cost)
 
         return w, b, history
