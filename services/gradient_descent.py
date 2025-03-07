@@ -32,7 +32,7 @@ class GradientDescent:
 
             #store the cost per iteration
             predictions = predictor.predict(w, b, x)
-            cost = mse(predictions, x, y)
+            cost = mse.call(predictions, x, y)
             history.append(cost)
 
         return w, b, history
