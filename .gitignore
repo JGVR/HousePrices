@@ -40,6 +40,12 @@ bld/
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
+#ignore DS_Store file
+.DS_Store
+
+#ignore venv folder
+venv/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
