@@ -15,8 +15,14 @@ for i in range(1,5):
         house = House(300 * i, 1.0 * i, i, 1 * i)
         houses.append(house)
     else:
-        house = House((300 * i) - 100, 1.0 * i, random.randint(2,10)*i, random.randint(1,200)*i)
+        house = House((300 * i) - 100, 1.0 * i, random.randint(2,10), random.randint(1,20))
         houses.append(house)
+
+for house in houses:
+    print(f"House sqft: {house.sqtf}")
+    print(f"House age: {house.age}")
+    print(f"House rooms: {house.rooms}")
+    print(f"House price: {house.price}")
 
 y_train = np.array([house.price for house in houses])
 m = len(houses)
@@ -73,27 +79,50 @@ print("Predictions shape:", predictions.shape)        # Expected: (19,)
 print("Predictions:", predictions)                     # Check prediction values
 
 
+# Get predictions for all scaled input data
+predictions = predictor.predict(w, b, X_train_scaled)
+
 # Create a 3D plot for visualization
 fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot the training data as red 'x' markers
-ax.scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], X_train_scaled[:, 2], 
-           c=y_train_scaled, cmap='viridis', marker='x', label='Training Data')
+sc1 = ax.scatter(
+    X_train_scaled[:, 0], 
+    X_train_scaled[:, 1], 
+    X_train_scaled[:, 2], 
+    c=y_train_scaled, 
+    cmap='viridis', 
+    marker='x', 
+    label='Training Data'
+)
 
-# Plot the predictions as blue points
-ax.scatter(X_train_scaled[:, 0], X_train_scaled[:, 1], X_train_scaled[:, 2], 
-           c=predictions, cmap='cool', marker='o', label='Predictions', alpha=0.6)
+# Plot the predictions as blue points with a color map
+sc2 = ax.scatter(
+    X_train_scaled[:, 0], 
+    X_train_scaled[:, 1], 
+    X_train_scaled[:, 2], 
+    c=predictions, 
+    cmap='cool', 
+    marker='o', 
+    label='Predictions', 
+    alpha=0.6
+)
+
+# Add text labels to points to show predicted price
+for i in range(len(predictions)):
+    ax.text(X_train_scaled[i, 0], X_train_scaled[i, 1], X_train_scaled[i, 2], 
+            f"{predictions[i]:.2f}", fontsize=8, color='black')
 
 # Set axis labels
 ax.set_xlabel('House Sqft (Scaled)')
 ax.set_ylabel('Number of Rooms (Scaled)')
 ax.set_zlabel('Age of House (Scaled)')
 
-# Add a color bar
-cbar = plt.colorbar(ax.collections[0], pad=0.1)
-cbar.set_label('House Price (Scaled)')
+# Add color bar to show the scale of predicted prices
+cbar = plt.colorbar(sc2, pad=0.1)
+cbar.set_label('Predicted Price (Scaled)')
 
-plt.title('3D Plot of House Features vs Predicted Prices')
+plt.title('3D Plot of House Features vs Predicted Prices with Labels')
 plt.legend()
 plt.show()
